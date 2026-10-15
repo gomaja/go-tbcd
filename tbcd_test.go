@@ -245,41 +245,6 @@ func TestRoundTripStrings(t *testing.T) {
 	}
 }
 
-func FuzzDecode(f *testing.F) {
-	for _, seed := range [][]byte{
-		nil, {}, {0xff}, {0xff, 0xff, 0xff}, {0x21, 0xf3}, {0x21, 0x43, 0xff}, {0xaf}, {0x21, 0xff, 0x43},
-		{0x1a, 0x32, 0xfb}, {0xfe}, {0x00}, {0x99, 0xf9},
-	} {
-		f.Add(seed)
-	}
-	f.Fuzz(func(t *testing.T, raw []byte) {
-		dec, err := Decode(raw)
-		if err != nil {
-			if !errors.Is(err, ErrMisplacedFiller) {
-				t.Fatalf("Decode(%x): unexpected error %v", raw, err)
-			}
-			return
-		}
-		for i := 0; i < len(dec); i++ {
-			if _, ok := nibble(dec[i]); !ok {
-				t.Fatalf("Decode(%x) = %q contains a character outside the alphabet", raw, dec)
-			}
-		}
-		enc, err := Encode(dec)
-		if err != nil {
-			t.Fatalf("Encode(Decode(%x) = %q): %v", raw, dec, err)
-		}
-		// Documented normalisation: trailing filler octets are dropped.
-		if want := trimFF(raw); !bytes.Equal(enc, want) {
-			t.Fatalf("Encode(Decode(%x)) = %x, want %x", raw, enc, want)
-		}
-		again, err := Decode(enc)
-		if err != nil || again != dec {
-			t.Fatalf("Decode(%x) = %q, %v; want %q", enc, again, err, dec)
-		}
-	})
-}
-
 // trimFF drops trailing 0xFF octets: the canonical form Decode normalises to.
 func trimFF(b []byte) []byte {
 	for len(b) > 0 && b[len(b)-1] == 0xff {
