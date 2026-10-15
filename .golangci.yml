@@ -1,0 +1,22 @@
+# golangci-lint configuration (v2 schema).
+#
+# The standard linters check correctness and unused code. Unconvert finds
+# conversions between identical types; gofmt checks source formatting.
+# golangci-lint must be built with a Go version at least as new as the
+# module's go directive.
+
+version: "2"
+
+linters:
+  default: standard
+  enable:
+    - unconvert
+
+issues:
+  # Report all findings from each linter and source line.
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+formatters:
+  enable:
+    - gofmt

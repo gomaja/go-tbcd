@@ -1,0 +1,11 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+
+# Go build and fuzz caches kept inside the tree by local tooling
+.gocache/
+.gotmp/
